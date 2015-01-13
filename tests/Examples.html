@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Linq.js Examples</title>
+    <script src="../bower_components/traceur-runtime/traceur-runtime.min.js"></script>
+    <script src="../src/linq.js"></script>
+    <style>
+        p { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+<div id="log"></div>
+
+<script>
+    try {
+        function whereGreaterThan5(item, index) {
+            return item > 5;
+        }
+
+        function selector(item, index) {
+            return item + 10;
+        }
+
+        var enumerable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .filter(whereGreaterThan5)
+                .map(selector);
+
+        log('toArray: ' + enumerable.toArray());
+
+        var enumerable1 = Enumerable.asEnumerable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                .filter(whereGreaterThan5)
+                .map(selector);
+
+        log('toArray1: ' + enumerable1.toArray());
+
+        var range = Enumerable.range(1, 10);
+        var range1 = Enumerable.range(10, 20);
+
+        log('range: ' + range.toArray());
+        log('range1: ' + range1.toArray());
+
+        var empty = Enumerable.empty();
+        for (var i of empty.select(function () {
+            throw new Error('never call');
+        })) {
+        }
+
+        var collection = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1].asEnumerable();
+        var reduced = collection.reduce(function (result, i) { return result + i; });
+        log('reduced: ' + reduced);
+
+        var reduced3 = collection.reduce(function (result, i) { return result + i; }, 10);
+        log('reduced3: ' + reduced3);
+
+        var reduced1 = collection.reduce(function (result, i) { return result + i; }, 0, function (accumulate) { return accumulate * 10; });
+        log('reduced1: ' + reduced1);
+
+        var reduced2 = collection.reduce(function (result, i) { return result + i; }, function (accumulate) { return accumulate * 5; });
+        log('reduced2: ' + reduced2);
+
+        var collection2 = [1, 2, 3].asEnumerable();
+        var first = collection2.first();
+        log('first: actual=' + first + ', expected=' + 1);
+
+        var first2 = collection2.first(function (i) { return i > 2; });
+        log('first2: actual=' + first2 + ', expected=' + 3);
+
+        var collection3 = [1].asEnumerable();
+        log('single: ' + collection3.single());
+
+        try {
+            collection2.single();
+        } catch (e) {
+            log('single: ' + e);
+        }
+
+        log('single2: ' + collection2.single(function (i) { return i === 2; }));
+
+        var collection4 = [true, true, true].asEnumerable();
+        log('any: ' + collection.any());
+        log('any1: ' + collection4.any(function (i) { return i === true; }));
+        log('all: ' + collection4.all(function (i) { return i === true; }));
+
+        log('count: ' + collection.count());
+        log('count1: ' + collection.count(function (i, index) { return index > 4; }));
+
+        var collection5 = [1,2,3].asEnumerable();
+        var concat = collection5.concat([4,5,6]);
+        log('concat: ' + concat.toArray());
+
+    } catch (e) {
+        log('error: ' + e);
+        console.error(e);
+    }
+
+    var logger;
+    function log(message) {
+        if (logger === undefined) {
+            logger = document.getElementById('log');
+        }
+
+        var lineNumber = logger.childElementCount + 1;
+        var text = document.createTextNode(lineNumber + ': ' + (message.toString() || ''));
+        var line = document.createElement('p');
+        line.appendChild(text);
+        logger.appendChild(line);
+    }
+</script>
+</body>
+</html>
