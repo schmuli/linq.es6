@@ -88,10 +88,10 @@
         var collection5 = [1,2,3].asEnumerable();
         var concat = collection5.concat([4,5,6]);
         log('concat: ' + concat.toArray());
-		
-		var collection6 = [{ items: [1,2,3] }, { items: [4,5,6] }].asEnumerable();
-		var selectMany = collection6.selectMany(function (i) { return i.items; });
-		log('selectMany: ' + selectMany.toArray());
+
+        var collection6 = [{ items: [1,2,3] }, { items: [4,5,6] }].asEnumerable();
+        var selectMany = collection6.selectMany(function (i) { return i.items; });
+        log('selectMany: ' + selectMany.toArray());
 
     } catch (e) {
         log('error: ' + e);

@@ -10,10 +10,10 @@ var Enumerable = (function () {
         // Static
 
         static asEnumerable(array) {
-			if (array instanceof Enumerable) {
-				return array;
-			}
-			
+            if (array instanceof Enumerable) {
+                return array;
+            }
+
             return new Enumerable(function* () {
                 for (var i = 0; i < array.length; i += 1) {
                     yield {item: array[i], index: i};
@@ -141,10 +141,10 @@ var Enumerable = (function () {
 
         concat(collection) {
             collection = Enumerable.asEnumerable(collection);
-			
-			return [this, collection]
-				.asEnumerable()
-				.selectMany(function (x) { return x; });
+
+            return [this, collection]
+                .asEnumerable()
+                .selectMany(function (x) { return x; });
         }
 
         select(selector) {
@@ -158,20 +158,20 @@ var Enumerable = (function () {
                 }
             });
         }
-		
-		selectMany(collectionSelector, resultSelector) {
-			resultSelector = resultSelector || function (_, j) { return j; };
-			var iterator = this.iterator;
-			return new Enumerable(function* () {
-				var index = 0;
-				for(var i of iterator()) {
-					var inner = collectionSelector(i.item, i.index);
-					for(var j of Enumerable.asEnumerable(inner)) {
-						yield { item: resultSelector(i.item, j), index: index++ };
-					}
-				}
-			});
-		}
+
+        selectMany(collectionSelector, resultSelector) {
+            resultSelector = resultSelector || function (_, j) { return j; };
+            var iterator = this.iterator;
+            return new Enumerable(function* () {
+                var index = 0;
+                for(var i of iterator()) {
+                    var inner = collectionSelector(i.item, i.index);
+                    for(var j of Enumerable.asEnumerable(inner)) {
+                        yield { item: resultSelector(i.item, j), index: index++ };
+                    }
+                }
+            });
+        }
 
         where(predicate) {
             var iterator = this.iterator;
