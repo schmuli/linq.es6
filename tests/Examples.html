@@ -3,7 +3,6 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Linq.js Examples</title>
-    <script src="../bower_components/traceur-runtime/traceur-runtime.min.js"></script>
     <script src="../src/linq.js"></script>
     <style>
         p { margin: 0; padding: 0; }
@@ -89,6 +88,10 @@
         var collection5 = [1,2,3].asEnumerable();
         var concat = collection5.concat([4,5,6]);
         log('concat: ' + concat.toArray());
+		
+		var collection6 = [{ items: [1,2,3] }, { items: [4,5,6] }].asEnumerable();
+		var selectMany = collection6.selectMany(function (i) { return i.items; });
+		log('selectMany: ' + selectMany.toArray());
 
     } catch (e) {
         log('error: ' + e);
