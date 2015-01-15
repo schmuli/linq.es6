@@ -93,6 +93,37 @@
         var selectMany = collection6.selectMany(function (i) { return i.items; });
         log('selectMany: ' + selectMany.toArray());
 
+        log('take(3): ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .take(3)
+                .toArray());
+        log('takeWhile: ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .takeWhile(function (i) { return i <= 5; })
+                .toArray());
+                
+        log('skip(3): ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .skip(3)
+                .toArray());
+        log('skipWhile: ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .skipWhile(function (i) { return i <= 5; })
+                .toArray());
+
+        log('reverse: ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .reverse()
+                .toArray());
+                
+        log('last: ' + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                .asEnumerable()
+                .last());
+                
+        log('defaultIfEmpty: ' + JSON.stringify([].asEnumerable().defaultIfEmpty().toArray()));
+        log('defaultIfEmpty1: ' + [].asEnumerable().defaultIfEmpty('defaultValue').toArray());
+        log('defaultIfEmpty2: ' + [1, 2, 3].asEnumerable().defaultIfEmpty().toArray());
+                
     } catch (e) {
         log('error: ' + e);
         console.error(e);
