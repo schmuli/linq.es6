@@ -77,7 +77,7 @@
 
         log('single2: ' + collection2.single(function (i) { return i === 2; }));
 
-        var collection4 = [true, true, true].asEnumerable();
+        var collection4 = [true, true, false].asEnumerable();
         log('any: ' + collection.any());
         log('any1: ' + collection4.any(function (i) { return i === true; }));
         log('all: ' + collection4.all(function (i) { return i === true; }));

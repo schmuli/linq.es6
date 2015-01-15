@@ -3,8 +3,10 @@
 var Enumerable = (function () {
 
     class Enumerable {
-        constructor(iterator) {
-            this.iterator = iterator;
+        constructor(iterator, source) {
+            this.iterator = function () {
+                return iterator(source);
+            };
         }
 
         // Static
@@ -36,21 +38,15 @@ var Enumerable = (function () {
         // Immediate
 
         all(predicate) {
-            for(var i of this.iterator()) {
-                if (!predicate(i.item, i.index)) {
-                    return false;
-                }
-            }
-            return true;
+            var nonMatch = this.first(function (item, index) {
+                return !predicate(item, index);
+            });
+            return nonMatch === undefined;
         }
 
         any(predicate) {
-            for(var i of this.iterator()) {
-                if (!predicate || predicate(i.item, i.index)) {
-                    return true;
-                }
-            }
-            return false;
+            var match = this.first(predicate);
+            return match !== undefined;
         }
 
         count(predicate) {
@@ -98,15 +94,14 @@ var Enumerable = (function () {
 
             var iterator = this.iterator();
             var next = iterator.next();
-            if (next.done) {
-                return undefined;
+            
+            if (!next.done) {
+                if (!iterator.next().done) {
+                    throw new Error('Sequence contains more than one element');
+                }
+                return next.value.item;
             }
-
-            if (!iterator.next().done) {
-                throw new Error('Sequence contains more than one element');
-            }
-
-            return next.value.item;
+            return undefined;
         }
 
         reduce(fn, initialValue, resultSelector) {
@@ -155,18 +150,14 @@ var Enumerable = (function () {
                 .selectMany(function (x) { return x; });
         }
 
-        defaultIfEmpty(defaultValue) {
-            var iterator = this.iterator;
-            
-            return new Enumerable(function* () {
+        defaultIfEmpty(defaultValue) {           
+            return this._enumerable(function* (iterator) {
                 var iter = iterator();
                 
                 var next = iter.next();
                 if (!next.done) {
-                    do {
-                        yield next.value;
-                        next = iter.next();
-                    } while(!next.done);
+                    yield next.value;
+                    yield* iter;
                 } else {
                     yield { item: defaultValue, index: 0 };
                 }
@@ -183,8 +174,7 @@ var Enumerable = (function () {
         }
         
         select(selector) {
-            var iterator = this.iterator;
-            return new Enumerable(function* () {
+            return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
                     yield {
                         item: selector(i.item, i.index),
@@ -195,9 +185,8 @@ var Enumerable = (function () {
         }
 
         selectMany(collectionSelector, resultSelector) {
-            resultSelector = resultSelector || function (_, j) { return j; };
-            var iterator = this.iterator;
-            return new Enumerable(function* () {
+            resultSelector = resultSelector || defaultResultSelector;
+            return this._enumerable(function* (iterator) {
                 var index = 0;
                 for(var i of iterator()) {
                     var inner = collectionSelector(i.item, i.index);
@@ -215,10 +204,9 @@ var Enumerable = (function () {
         }
         
         skipWhile(selector) {
-            var iterator = this.iterator;
             var test = skip;
             
-            return new Enumerable(function* () {
+            return this._enumerable(function* (iterator) {
                 for(var i of iterator()) {
                     if(!test(i.item, i.index)) {
                         yield i;
@@ -238,8 +226,7 @@ var Enumerable = (function () {
         }
         
         where(predicate) {
-            var iterator = this.iterator;
-            return new Enumerable(function* () {
+            return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
                     if (predicate(i.item, i.index)) {
                         yield i;
@@ -255,8 +242,7 @@ var Enumerable = (function () {
         }
         
         takeWhile(selector) {
-            var iterator = this.iterator;
-            return new Enumerable(function* () {
+            return this._enumerable(function* (iterator) {
                 for(var i of iterator()) {
                     if (!selector(i.item, i.index)) {
                         break;
@@ -264,6 +250,11 @@ var Enumerable = (function () {
                     yield i;
                 }
             });
+        }
+        
+        // private
+        _enumerable(iterator) {
+            return new Enumerable(iterator, this.iterator);
         }
     }
 
@@ -300,5 +291,9 @@ var Enumerable = (function () {
     
     function copy(existingName, newName) {
         Enumerable.prototype[newName] = Enumerable.prototype[existingName];
+    }
+    
+    function defaultResultSelector(coll, item) {
+        return item;
     }
 }());
