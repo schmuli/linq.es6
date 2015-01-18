@@ -24,11 +24,12 @@ var Enumerable = (function () {
         }
 
         static range(start, count) {
+            start = start - 1;
             return new Enumerable(function* () {
-                for (var i = start, index = 0; i <= count; i += 1, index += 1) {
+                for (var i = 0; i < count; i += 1) {
                     yield {
-                        item: i,
-                        index: index
+                        item: start += 1,
+                        index: i
                     };
                 }
             });
@@ -42,6 +43,8 @@ var Enumerable = (function () {
         // Immediate
 
         all(predicate) {
+            validFn(predicate);
+
             for (var i of this.iterator()) {
                 if (!predicate(i.item, i.index)) {
                     return false;
@@ -94,6 +97,38 @@ var Enumerable = (function () {
             return last;
         }
 
+        reduce(fn, initialValue, resultSelector) {
+            validFn(fn);
+
+            if (resultSelector === undefined && typeof initialValue === 'function') {
+                resultSelector = initialValue;
+                initialValue = undefined;
+            }
+
+            var iterator = this.iterator();
+            var next = iterator.next();
+
+            var accumulate = initialValue;
+            if (initialValue === undefined) {
+                if (next.done) {
+                    throw new TypeError('Sequence contains no elements');
+                }
+                accumulate = next.value.item;
+                next = iterator.next();
+            }
+
+            while (!next.done) {
+                accumulate = fn(accumulate, next.value.item, next.value.index);
+                next = iterator.next();
+            }
+
+            if (resultSelector) {
+                accumulate = resultSelector(accumulate);
+            }
+
+            return accumulate;
+        }
+
         single(predicate) {
             if (predicate) {
                 return this.filter(predicate).single();
@@ -109,36 +144,6 @@ var Enumerable = (function () {
                 return next.value.item;
             }
             return undefined;
-        }
-
-        reduce(fn, initialValue, resultSelector) {
-            if (resultSelector === undefined && typeof initialValue === 'function') {
-                resultSelector = initialValue;
-                initialValue = undefined;
-            }
-
-            var iterator = this.iterator();
-            var next;
-
-            var accumulate = initialValue;
-            if (initialValue === undefined) {
-                next = iterator.next();
-                if (next.done) {
-                    throw new TypeError('Sequence contains no elements');
-                }
-                accumulate = next.value.item;
-            }
-
-            do {
-                next = iterator.next();
-                accumulate = fn(accumulate, next.value.item, next.value.index);
-            } while(!next.done);
-
-            if (resultSelector) {
-                accumulate = resultSelector(accumulate);
-            }
-
-            return accumulate;
         }
 
         toArray() {
@@ -235,6 +240,8 @@ var Enumerable = (function () {
         }
 
         where(predicate) {
+            validFn(predicate);
+
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
                     if (predicate(i.item, i.index)) {
@@ -289,6 +296,18 @@ var Enumerable = (function () {
     };
 
     return Enumerable;
+
+    function validFn(fn, message) {
+        if (typeof fn !== 'function') {
+            throw new TypeError(message);
+        }
+    }
+
+    function validArg(arg, message) {
+        if (!arg) {
+            throw new TypeError(message);
+        }
+    }
 
     function reduceInternal(enumerable, reverse) {
         var fn = reverse ? 'unshift' : 'push';
