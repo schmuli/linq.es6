@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 var Enumerable = (function () {
 
@@ -26,20 +26,24 @@ var Enumerable = (function () {
         static range(start, count) {
             return new Enumerable(function* () {
                 for (var i = start, index = 0; i <= count; i += 1, index += 1) {
-                    yield {item: i, index: index};
+                    yield {
+                        item: i,
+                        index: index
+                    };
                 }
             });
         }
 
         static empty() {
-            return new Enumerable(function* () { });
+            return new Enumerable(function* () {
+            });
         }
 
         // Immediate
 
         all(predicate) {
-            for(var i of this.iterator()) {
-                if (!predicate(i.item, i.index) {
+            for (var i of this.iterator()) {
+                if (!predicate(i.item, i.index)) {
                     return false;
                 }
             }
@@ -55,20 +59,22 @@ var Enumerable = (function () {
                 return this.filter(predicate).count();
             }
 
-            return this.reduce(function (count) { return count + 1; }, 0);
+            return this.reduce(function (count) {
+                return count + 1;
+            }, 0);
         }
-        
+
         first(predicate) {
             if (predicate) {
                 return this.filter(predicate).first();
             }
 
             var next = this.iterator().next();
-            return next && !next.done
+            return !next.done
                 ? next.value.item
                 : undefined;
         }
-        
+
         forEach(fn) {
             for (var i of this.iterator()) {
                 fn(i.item, i.index);
@@ -80,14 +86,14 @@ var Enumerable = (function () {
             if (predicate) {
                 return this.filter(predicate).last();
             }
-            
+
             var last;
-            for(var i of this.iterator()) {
+            for (var i of this.iterator()) {
                 last = i.item;
             }
             return last;
         }
-        
+
         single(predicate) {
             if (predicate) {
                 return this.filter(predicate).single();
@@ -95,7 +101,7 @@ var Enumerable = (function () {
 
             var iterator = this.iterator();
             var next = iterator.next();
-            
+
             if (!next.done) {
                 if (!iterator.next().done) {
                     throw new Error('Sequence contains more than one element');
@@ -112,23 +118,23 @@ var Enumerable = (function () {
             }
 
             var iterator = this.iterator();
-            var next = iterator.next();
+            var next;
 
             var accumulate = initialValue;
-            if(initialValue === undefined){
+            if (initialValue === undefined) {
+                next = iterator.next();
                 if (next.done) {
                     throw new TypeError('Sequence contains no elements');
                 }
                 accumulate = next.value.item;
-                next = iterator.next();
             }
 
-            while(!next.done) {
+            do {
+                next = iterator.next();
                 accumulate = fn(accumulate, next.value.item, next.value.index);
-                next = iterator.next();
-            }
+            } while(!next.done);
 
-            if(resultSelector) {
+            if (resultSelector) {
                 accumulate = resultSelector(accumulate);
             }
 
@@ -142,36 +148,37 @@ var Enumerable = (function () {
         // Lazy
 
         concat(collection) {
-            collection = Enumerable.asEnumerable(collection);
-
-            return [this, collection]
+            return [this, Enumerable.asEnumerable(collection)]
                 .asEnumerable()
-                .selectMany(function (x) { return x; });
+                .selectMany(identity);
         }
 
-        defaultIfEmpty(defaultValue) {           
+        defaultIfEmpty(defaultValue) {
             return this._enumerable(function* (iterator) {
                 var iter = iterator();
-                
+
                 var next = iter.next();
                 if (!next.done) {
                     yield next.value;
                     yield* iter;
                 } else {
-                    yield { item: defaultValue, index: 0 };
+                    yield {
+                        item: defaultValue,
+                        index: 0
+                    };
                 }
             });
         }
-        
+
         reverse() {
             var source = this;
-            
+
             return new Enumerable(function* () {
-                var reversed = reduceInternal(source, true);                
+                var reversed = reduceInternal(source, true);
                 yield* reversed.asEnumerable().iterator();
             });
         }
-        
+
         select(selector) {
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
@@ -187,10 +194,13 @@ var Enumerable = (function () {
             resultSelector = resultSelector || defaultResultSelector;
             return this._enumerable(function* (iterator) {
                 var index = 0;
-                for(var i of iterator()) {
+                for (var i of iterator()) {
                     var inner = collectionSelector(i.item, i.index);
-                    for(var j of Enumerable.asEnumerable(inner)) {
-                        yield { item: resultSelector(i.item, j), index: index++ };
+                    for (var j of Enumerable.asEnumerable(inner)) {
+                        yield {
+                            item: resultSelector(i.item, j),
+                            index: index++
+                        };
                     }
                 }
             });
@@ -201,27 +211,29 @@ var Enumerable = (function () {
                 return index < count;
             });
         }
-        
+
         skipWhile(selector) {
             var test = skip;
-            
+
             return this._enumerable(function* (iterator) {
-                for(var i of iterator()) {
-                    if(!test(i.item, i.index)) {
+                for (var i of iterator()) {
+                    if (!test(i.item, i.index)) {
                         yield i;
                     }
                 }
             });
-            
+
             function skip(item, index) {
                 var result = selector(item, index);
                 if (!result) {
-                    test = function () { return false; };
+                    test = function () {
+                        return false;
+                    };
                 }
                 return result;
             }
         }
-        
+
         where(predicate) {
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
@@ -231,16 +243,16 @@ var Enumerable = (function () {
                 }
             });
         }
-        
+
         take(count) {
             return this.takeWhile(function (item, index) {
                 return index < count;
             });
         }
-        
+
         takeWhile(selector) {
             return this._enumerable(function* (iterator) {
-                for(var i of iterator()) {
+                for (var i of iterator()) {
                     if (!selector(i.item, i.index)) {
                         break;
                     }
@@ -248,7 +260,7 @@ var Enumerable = (function () {
                 }
             });
         }
-        
+
         // private
         _enumerable(iterator) {
             return new Enumerable(iterator, this.iterator);
@@ -279,17 +291,21 @@ var Enumerable = (function () {
     return Enumerable;
 
     function reduceInternal(enumerable, reverse) {
-        var fn = reverse ? 'unshift' : 'push'
+        var fn = reverse ? 'unshift' : 'push';
         return enumerable.reduce(function (result, item) {
             result[fn](item);
             return result;
         }, []);
     }
-    
+
     function copy(existingName, newName) {
         Enumerable.prototype[newName] = Enumerable.prototype[existingName];
     }
-    
+
+    function identity(x) {
+        return x;
+    }
+
     function defaultResultSelector(coll, item) {
         return item;
     }
