@@ -1,4 +1,10 @@
 {
-	name: "linq.es6",
-	description: ""
+  "name": "linq.es6",
+  "description": "",
+  "devDependencies": {
+    "jasmine-core": "^2.1.3",
+    "karma": "^0.12.31",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-jasmine": "^0.3.4"
+  }
 }
