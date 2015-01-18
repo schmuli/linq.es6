@@ -38,15 +38,16 @@ var Enumerable = (function () {
         // Immediate
 
         all(predicate) {
-            var nonMatch = this.first(function (item, index) {
-                return !predicate(item, index);
-            });
-            return nonMatch === undefined;
+            for(var i of this.iterator()) {
+                if (!predicate(i.item, i.index) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         any(predicate) {
-            var match = this.first(predicate);
-            return match !== undefined;
+            return this.first(predicate) !== undefined;
         }
 
         count(predicate) {
@@ -113,15 +114,13 @@ var Enumerable = (function () {
             var iterator = this.iterator();
             var next = iterator.next();
 
-            var accumulate;
+            var accumulate = initialValue;
             if(initialValue === undefined){
                 if (next.done) {
                     throw new TypeError('Sequence contains no elements');
                 }
                 accumulate = next.value.item;
                 next = iterator.next();
-            } else {
-                accumulate = initialValue;
             }
 
             while(!next.done) {
@@ -217,12 +216,10 @@ var Enumerable = (function () {
             function skip(item, index) {
                 var result = selector(item, index);
                 if (!result) {
-                    test = falseFn;
+                    test = function () { return false; };
                 }
                 return result;
             }
-            
-            function falseFn() { return false; }
         }
         
         where(predicate) {
