@@ -15,13 +15,15 @@ describe("Enumerable.range", function () {
 
     it('should start from the correct value', function () {
         // Arrange
-        var enumerable = Enumerable.range(1, 2);
+        var enumerable = Enumerable.range(1, 10);
 
         // Act
-        var first = enumerable.toArray()[0];
+        var result = enumerable.toArray();
 
         // Assert
-        expect(first).toBe(1);
+        expect(result[0]).toBe(1);
+        expect(result.length).toBe(10);
+        expect(result[9]).toBe(10);
     });
 
     it('should contain the correct number of elements', function () {

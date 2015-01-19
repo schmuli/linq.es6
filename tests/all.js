@@ -2,7 +2,7 @@
 
 describe('Enumerable.prototype.all', function () {
 
-    it('to throw when passed invalid function argument', function () {
+    it('should throw when passed invalid function argument', function () {
         // Arrange
         var enumerable = [1].asEnumerable();
 

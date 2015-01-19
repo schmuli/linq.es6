@@ -2,6 +2,22 @@
 
 var Enumerable = (function () {
 
+    class Expect {
+        static validFn(fn, message) {
+            Expect.valid(typeof fn === 'function', message);
+        }
+
+        static validArg(arg, message) {
+            Expect.valid(!!arg, message);
+        }
+
+        static valid(condition, message) {
+            if(!condition) {
+                throw new TypeError(message);
+            }
+        }
+    }
+
     class Enumerable {
         constructor(iterator, source) {
             this.iterator = function () {
@@ -11,19 +27,23 @@ var Enumerable = (function () {
 
         // Static
 
-        static asEnumerable(array) {
-            if (array instanceof Enumerable) {
-                return array;
+        static asEnumerable(collection) {
+            if (collection instanceof Enumerable) {
+                return collection;
             }
 
+            Expect.valid(collection instanceof Array);
+
             return new Enumerable(function* () {
-                for (var i = 0; i < array.length; i += 1) {
-                    yield {item: array[i], index: i};
+                for (var i = 0; i < collection.length; i += 1) {
+                    yield {item: collection[i], index: i};
                 }
             });
         }
 
         static range(start, count) {
+            Expect.valid(count > 1);
+
             start = start - 1;
             return new Enumerable(function* () {
                 for (var i = 0; i < count; i += 1) {
@@ -43,7 +63,7 @@ var Enumerable = (function () {
         // Immediate
 
         all(predicate) {
-            validFn(predicate);
+            Expect.validFn(predicate);
 
             for (var i of this.iterator()) {
                 if (!predicate(i.item, i.index)) {
@@ -79,6 +99,8 @@ var Enumerable = (function () {
         }
 
         forEach(fn) {
+            Expect.validFn(fn);
+
             for (var i of this.iterator()) {
                 fn(i.item, i.index);
             }
@@ -98,7 +120,7 @@ var Enumerable = (function () {
         }
 
         reduce(fn, initialValue, resultSelector) {
-            validFn(fn);
+            Expect.validFn(fn);
 
             if (resultSelector === undefined && typeof initialValue === 'function') {
                 resultSelector = initialValue;
@@ -153,6 +175,8 @@ var Enumerable = (function () {
         // Lazy
 
         concat(collection) {
+            Expect.validArg(collection);
+
             return [this, Enumerable.asEnumerable(collection)]
                 .asEnumerable()
                 .selectMany(identity);
@@ -185,6 +209,8 @@ var Enumerable = (function () {
         }
 
         select(selector) {
+            Expect.validFn(selector);
+
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
                     yield {
@@ -196,6 +222,8 @@ var Enumerable = (function () {
         }
 
         selectMany(collectionSelector, resultSelector) {
+            Expect.validFn(collectionSelector);
+
             resultSelector = resultSelector || defaultResultSelector;
             return this._enumerable(function* (iterator) {
                 var index = 0;
@@ -212,12 +240,16 @@ var Enumerable = (function () {
         }
 
         skip(count) {
+            Expect.valid(count >= 0);
+
             return this.skipWhile(function (item, index) {
                 return index < count;
             });
         }
 
         skipWhile(selector) {
+            Expect.validFn(selector);
+
             var test = skip;
 
             return this._enumerable(function* (iterator) {
@@ -240,7 +272,7 @@ var Enumerable = (function () {
         }
 
         where(predicate) {
-            validFn(predicate);
+            Expect.validFn(predicate);
 
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
@@ -252,12 +284,16 @@ var Enumerable = (function () {
         }
 
         take(count) {
+            Expect.valid(count >= 0);
+
             return this.takeWhile(function (item, index) {
                 return index < count;
             });
         }
 
         takeWhile(selector) {
+            Expect.validFn(selector);
+
             return this._enumerable(function* (iterator) {
                 for (var i of iterator()) {
                     if (!selector(i.item, i.index)) {
@@ -296,18 +332,6 @@ var Enumerable = (function () {
     };
 
     return Enumerable;
-
-    function validFn(fn, message) {
-        if (typeof fn !== 'function') {
-            throw new TypeError(message);
-        }
-    }
-
-    function validArg(arg, message) {
-        if (!arg) {
-            throw new TypeError(message);
-        }
-    }
 
     function reduceInternal(enumerable, reverse) {
         var fn = reverse ? 'unshift' : 'push';
