@@ -5,17 +5,14 @@ describe('The two basic principles of LINQ', function () {
     it('uses lazy evaluation', function () {
         // Arrange
         var enumerable = Enumerable.range(0, 10);
-        var called = false;
 
         // Act
         enumerable
             .filter(function () {
-                called = true;
-                return true;
+                fail('This function should not be called');
             });
 
         // Assert
-        expect(called).toBe(false);
     });
 
     it('can reuse an enumerable instance multiple times with same result', function () {
