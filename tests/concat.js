@@ -2,7 +2,7 @@
 
 describe('Enumerable.prototype.concat', function () {
 
-    it('should throw when passed invalid aruments', function () {
+    it('should throw when passed invalid arguments', function () {
         // Arrange
         var enumerable = Enumerable.range(0, 5);
 
@@ -24,7 +24,7 @@ describe('Enumerable.prototype.concat', function () {
         expect(result.length).toBe(10);
     });
 
-    it('should combine an enumerabe', function () {
+    it('should combine an enumerable', function () {
         // Arrange
         var enumerable1 = Enumerable.range(0, 5);
         var enumerable2 = Enumerable.range(0, 5);
