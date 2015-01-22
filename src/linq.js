@@ -78,7 +78,7 @@ var Enumerable = (function () {
         }
 
         count(predicate) {
-            if (predicate) {
+            if (predicate !== undefined) {
                 return this.filter(predicate).count();
             }
 
@@ -88,7 +88,7 @@ var Enumerable = (function () {
         }
 
         first(predicate) {
-            if (predicate) {
+            if (predicate !== undefined) {
                 return this.filter(predicate).first();
             }
 
@@ -108,7 +108,7 @@ var Enumerable = (function () {
         }
 
         last(predicate) {
-            if (predicate) {
+            if (predicate !== undefined) {
                 return this.filter(predicate).last();
             }
 
@@ -152,7 +152,7 @@ var Enumerable = (function () {
         }
 
         single(predicate) {
-            if (predicate) {
+            if (predicate !== undefined) {
                 return this.filter(predicate).single();
             }
 
