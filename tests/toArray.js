@@ -23,4 +23,5 @@ describe('Enumerable.prototype.toArray', function () {
         // Assert
         expect(result.length).toBe(array.length);
     });
+
 });
