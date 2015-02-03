@@ -11,6 +11,10 @@ var Enumerable = (function () {
             Expect.valid(!!arg, message);
         }
 
+        static validNumber(arg, message) {
+            Expect.valid(typeof arg === 'number' && arg > 0, message);
+        }
+        
         static valid(condition, message) {
             if(!condition) {
                 throw new TypeError(message);
@@ -42,7 +46,7 @@ var Enumerable = (function () {
         }
 
         static range(start, count) {
-            Expect.valid(count > 1);
+            Expect.validNumber(count);
 
             start = start - 1;
             return new Enumerable(function* () {
@@ -57,6 +61,19 @@ var Enumerable = (function () {
 
         static empty() {
             return new Enumerable(function* () {
+            });
+        }
+        
+        static repeat(value, count) {
+            Expect.validNumber(count);
+            
+            return new Enumerable(function* () {
+                for(var i = 0; i < count; i += 1) {
+                    yield {
+                        item: value,
+                        index: i
+                    };
+                }
             });
         }
 
