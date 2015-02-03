@@ -1,50 +1,25 @@
-## Example Usage
+# LINQ in ES6
 
-```javascript
-function whereGreaterThan5(item, index) {
-    return item > 5;
-}
+An implementation of LINQ using features available in ES6, such as Iterators and Generators.
 
-function selector(item, index) {
-    return item + 10;
-}
+## Enabling ES6
 
-var enumerable = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    .asEnumerable()
-    .filter(whereGreaterThan5)
-    .map(selector);
+The implementation uses ES6 features available in Chrome Canary, and will be updated (hopefully) when newer features are supported in Chrome Canary.
 
-log('toArray: ' + enumerable.toArray());
+### Browsers
 
-var enumerable1 = Enumerable.asEnumerable([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    .filter(whereGreaterThan5)
-    .map(selector);
+Support Chrome Canary
 
-log('toArray1: ' + enumerable1.toArray());
+Enabling Experimental JavaScript features
 
-var range = Enumerable.range(1, 10);
-var range1 = Enumerable.range(10, 20);
+### Node.js with V8
 
-log('range: ' + range.toArray());
-log('range1: ' + range1.toArray());
+Enabling Harmony flag
 
-var empty = Enumerable.empty();
-for(var i of empty.select(function () { throw new Error('never call'); })) {}
+## Getting Linq.es6
 
-} catch (e) {
-    log('error: ' + e + (e.stack || ''));
-}
+NPM
 
-var logger;
-function log(message) {
-    if (logger === undefined) {
-        logger = document.getElementById('log');
-    }
+Bower
 
-    var lineNumber = logger.childElementCount + 1;
-    var text = document.createTextNode(lineNumber + ': ' + (message.toString() || ''));
-    var line = document.createElement('p');
-    line.appendChild(text);
-    logger.appendChild(line);
-}
-```
+Nuget
