@@ -23,3 +23,43 @@ NPM
 Bower
 
 Nuget
+
+## Examples
+
+## Supported LINQ Functions
+
+### Creation Functions
+
+* asEnumerable(array)
+* range(start, count)
+* repeat(value, count)
+* empty()
+
+### Immediate Functions
+
+* all(predicate)
+* any(predicate?)
+* count(predicate?)
+* first(predicate?)
+* forEach(fn)
+* last(predicate?)
+* reduce(fn, initialValue?, resultSelector?)
+* single(predicate?)
+* toArray()
+
+### Lazy Functions
+
+* concat(collection)
+* defaultIfEmpty(defaultValue?)
+* reverse()
+* select(predicate)
+* selectMany(collectionSelector, resultSelector?)
+* skip(count)
+* skipWhile(predicate)
+* where(predicate)
+* take(count)
+* takeWhile(predicate)
+
+## Building and Testing
+
+Karma
